@@ -1,30 +1,122 @@
-// Domain Slider Navigation
+
+
+
+
+// Domain Slider Navigation – Mobile & Desktop Fix
 const leftArrow = document.querySelector(".left-arrow");
 const rightArrow = document.querySelector(".right-arrow");
 const domainGrid = document.querySelector(".domain-grid");
+const cards = document.querySelectorAll(".domain-card");
 
-if (leftArrow && rightArrow && domainGrid) {
-    leftArrow.addEventListener("click", () => {
-        domainGrid.scrollBy({
-            left: -385,
-            behavior: "smooth",
-        });
+if (leftArrow && rightArrow && domainGrid && cards.length > 0) {
+  
+  // Function to get current card width + gap
+  function getCardWidth() {
+    const isMobile = window.innerWidth <= 424;
+    if (isMobile) {
+      // Mobile: Card width 280px + gap 16px (1rem) = 296px
+      // CHANGE HERE: Agar card ka actual width alag ho to yaha change karo
+      return 236 + 16; // = 296px per card scroll
+    } else {
+      // Desktop: Card width 169px + gap 24px (1.5rem) = 193px
+      // CHANGE HERE: Desktop scroll distance adjust karne ke liye
+      return 172 + 24; // = 193px per card scroll
+    }
+  }
+
+  // Function to get max scroll
+  function getMaxScroll() {
+    return domainGrid.scrollWidth - domainGrid.clientWidth;
+  }
+
+  // Update button states based on scroll position
+  function updateButtons() {
+    const currentScroll = domainGrid.scrollLeft;
+    const maxScroll = getMaxScroll();
+
+    // Left button: Disabled at start
+    if (currentScroll <= 0) {
+      leftArrow.style.opacity = '0.5';
+      leftArrow.disabled = true;
+    } else {
+      leftArrow.style.opacity = '1';
+      leftArrow.disabled = false;
+    }
+
+    // Right button: Disabled at end (with 10px buffer for precision)
+    if (currentScroll >= maxScroll - 10) {
+      rightArrow.style.opacity = '0.5';
+      rightArrow.disabled = true;
+    } else {
+      rightArrow.style.opacity = '1';
+      rightArrow.disabled = false;
+    }
+  }
+
+  // Scroll function - ONE card at a time
+  function scrollCarousel(direction) {
+    const scrollAmount = getCardWidth(); // Mobile: 296px, Desktop: 193px
+    const currentScroll = domainGrid.scrollLeft;
+    const maxScroll = getMaxScroll();
+    
+    let newScroll;
+    if (direction === 'left') {
+      newScroll = currentScroll - scrollAmount;
+      if (newScroll < 0) newScroll = 0; // Don't go below 0
+    } else {
+      newScroll = currentScroll + scrollAmount;
+      if (newScroll > maxScroll) newScroll = maxScroll; // Don't exceed max
+    }
+
+    domainGrid.scrollTo({
+      left: newScroll,
+      behavior: "smooth",
     });
 
-    rightArrow.addEventListener("click", () => {
-        domainGrid.scrollBy({
-            left: 385,
-            behavior: "smooth",
-        });
-    });
+    // Update buttons after scroll completes (300ms = animation duration)
+    setTimeout(updateButtons, 300);
+  }
+
+  // Left arrow click
+  leftArrow.addEventListener("click", () => {
+    if (!leftArrow.disabled) {
+      scrollCarousel('left');
+    }
+  });
+
+  // Right arrow click
+  rightArrow.addEventListener("click", () => {
+    if (!rightArrow.disabled) {
+      scrollCarousel('right');
+    }
+  });
+
+  // On window resize, recalculate and reset
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      domainGrid.scrollLeft = 0; // Reset to start
+      updateButtons();
+    }, 250);
+  });
+
+  // On scroll (user manually scrolls), update buttons
+  domainGrid.addEventListener('scroll', () => {
+    updateButtons();
+  });
+
+  // Initial button state on load
+  updateButtons();
 }
 
-// faq according...!
+
+
+// copiwali 
 const faqItems = document.querySelectorAll(".faq-item");
 
 faqItems.forEach((item) => {
     const question = item.querySelector(".faq-question");
-    const plusImg = question.querySelector(".plus_img img");
 
     if (question) {
         question.addEventListener("click", () => {
@@ -33,31 +125,18 @@ faqItems.forEach((item) => {
             // Pehle saare items band karo
             faqItems.forEach((otherItem) => {
                 otherItem.classList.remove("active");
-                const otherAnswer = otherItem.querySelector(".faq-answer");
-                const otherPlus = otherItem.querySelector(".plus_img img");
-                if (otherAnswer) {
-                    otherAnswer.style.display = "none";
-                }
-                if (otherPlus) {
-                    otherPlus.style.transform = "rotate(0deg)";
-                }
             });
 
             // Agar ye item pehle se active nahi tha, toh isko activate karo
             if (!isActive) {
                 item.classList.add("active");
-                const answer = item.querySelector(".faq-answer");
-                if (answer) {
-                    answer.style.display = "block";
-                }
-                if (plusImg) {
-                    plusImg.style.transform = "rotate(45deg)";
-                }
             }
         });
     }
 });
+       
 
+    
 // Search functionality with VALIDATION
 const searchBtn = document.querySelector(".search-btn");
 const domainSearchInput = document.querySelector(".domain-search");
@@ -133,149 +212,7 @@ domainSuggestions.forEach((tag) => {
     });
 });
 
-// Smooth scroll for navigation - FIXED VERSION
-// const navLinks = document.querySelectorAll(".nav-menu a");
 
-// navLinks.forEach((link) => {
-//     link.addEventListener("click", (e) => {
-//         const href = link.getAttribute("href");
-
-//         // Agar # se start hota hai (same page scroll)
-//         if (href && href.startsWith("#") && href !== "#") {
-//             e.preventDefault();
-//             const targetId = href.substring(1); // Remove #
-//             const targetSection = document.getElementById(targetId);
-
-//             if (targetSection) {
-//                 targetSection.scrollIntoView({
-//                     behavior: "smooth",
-//                     block: "start",
-//                 });
-//             } else {
-//                 console.log("Section not found:", targetId);
-//             }
-//         }
-//     });
-// });
-
-// faq-perfect
-// document.addEventListener("DOMContentLoaded", function () {
-//     // console.log("FAQ Script Loaded");
-
-//     //CROSS BUTTON FOR FIRST FAQ ITEM
-//     const faqItemOne = document.querySelector(".faq-item-one");
-//     const crossBtn = document.querySelector(".cross-btn-faq");
-
-//     // if (crossBtn && faqItemOne) {
-//     //     crossBtn.addEventListener("click", function (e) {
-//     //         e.stopPropagation();
-//     //         // console.log("Cross button clicked");
-
-//     //         faqItemOne.style.transition = "all 0.4s ease";
-//     //         faqItemOne.style.opacity = "0";
-//     //         faqItemOne.style.transform = "translateY(-20px)";
-
-//     //         setTimeout(() => {
-//     //             faqItemOne.style.display = "none";
-//     //         }, 400);
-//     //     });
-//     // }
-
-//     // REGULAR FAQ ACCORDION 
-//     const faqItems = document.querySelectorAll(".faq-item");
-
-//     faqItems.forEach((item, index) => {
-//         const question = item.querySelector(".faq-question");
-//         const plusImg = item.querySelector(".plus_img");
-
-//         // Common click handler function (used by both question & plus icon)
-//         const toggleFAQ = (e) => {
-//             e.stopPropagation(); // prevent double triggering
-//             const isActive = item.classList.contains("active");
-
-//             // Close all other FAQs
-//             faqItems.forEach((otherItem) => {
-//                 if (otherItem !== item) {
-//                     otherItem.classList.remove("active");
-//                     const otherAnswer = otherItem.querySelector(".faq-answer");
-//                     const otherPlusImg = otherItem.querySelector(".plus_img img");
-//                     if (otherAnswer) otherAnswer.style.display = "none";
-//                     if (otherPlusImg) otherPlusImg.style.transform = "rotate(0deg)";
-//                 }
-//             });
-
-//             // Toggle current FAQ
-//             const answer = item.querySelector(".faq-answer");
-//             const img = item.querySelector(".plus_img img");
-
-//             if (isActive) {
-//                 // close current
-//                 item.classList.remove("active");
-//                 if (answer) answer.style.display = "none";
-//                 if (img) img.style.transform = "rotate(0deg)";
-//             } else {
-//                 // open current
-//                 item.classList.add("active");
-//                 if (answer) answer.style.display = "block";
-//                 if (img) img.style.transform = "rotate(45deg)";
-//             }
-//         };
-
-//         // Click listener for question
-//         if (question) {
-//             question.addEventListener("click", toggleFAQ);
-//         }
-
-//         // Click listener for plus icon (optional, for direct clicks)
-//         if (plusImg) {
-//             plusImg.addEventListener("click", toggleFAQ);
-//         }
-//     });
-// });
-
-// all for same
-
-//     document.addEventListener("DOMContentLoaded", function () {
-//     const faqItems = document.querySelectorAll(".faq-item");
-
-//     faqItems.forEach((item) => {
-//         const question = item.querySelector(".faq-question");
-//         const plusImg = item.querySelector(".plus_img");
-
-//         const toggleFAQ = (e) => {
-//             e.stopPropagation();
-//             const isActive = item.classList.contains("active");
-
-//             // Close all other FAQs
-//             faqItems.forEach((otherItem) => {
-//                 if (otherItem !== item) {
-//                     otherItem.classList.remove("active");
-//                     const otherAnswer = otherItem.querySelector(".faq-answer");
-//                     const otherPlusImg = otherItem.querySelector(".plus_img img");
-//                     if (otherAnswer) otherAnswer.style.display = "none";
-//                     if (otherPlusImg) otherPlusImg.style.transform = "rotate(0deg)";
-//                 }
-//             });
-
-//             // Toggle current
-//             const answer = item.querySelector(".faq-answer");
-//             const img = item.querySelector(".plus_img img");
-
-//             if (isActive) {
-//                 item.classList.remove("active");
-//                 if (answer) answer.style.display = "none";
-//                 if (img) img.style.transform = "rotate(0deg)";
-//             } else {
-//                 item.classList.add("active");
-//                 if (answer) answer.style.display = "block";
-//                 if (img) img.style.transform = "rotate(45deg)";
-//             }
-//         };
-
-//         if (question) question.addEventListener("click", toggleFAQ);
-//         if (plusImg) plusImg.addEventListener("click", toggleFAQ);
-//     });
-// });
 
 document.addEventListener("DOMContentLoaded", function () {
   const faqItems = document.querySelectorAll(".faq-item");
@@ -419,26 +356,7 @@ collectionDomainCards.forEach((card) => {
     });
 });
 
-// const leftTestimonialSection = document.querySelector('.testimonial-left-arrow-img');
-// const rightTestimonialSection = document.querySelector('.testimonial-right-arrow-img');
-// const testimonialContainer = document.querySelector('.testimonials-container');
 
-// if(leftTestimonialSection && rightTestimonialSection && testimonialContainer){
-
-//     leftTestimonialSection.addEventListener('click', ()=>{
-//         testimonialContainer.scrollBy({
-//             left:-300,
-//             behavior:'smooth',
-//         });
-//     });
-
-//      rightTestimonialSection.addEventListener('click', ()=>{
-//         testimonialContainer.scrollBy({
-//             left:300,
-//             behavior:'smooth',
-//         });
-//     });
-// }
 
 const searchBtnFooter = document.querySelector(".search-btn-footer");
 const domainSearchInputFooter = document.querySelector(".domain-search-footer");
@@ -514,113 +432,131 @@ domainSuggestionsFooter.forEach((tag) => {
 
 
 
-// testimonial scrolling
-const testimonialLeftArrow = document.querySelector(
-    ".testimonial-left-arrow-img"
-);
-const testimonialRightArrow = document.querySelector(
-    ".testimonial-right-arrow-img"
-);
+
+// Testimonial scrolling - UNIFIED FIX for Desktop + Mobile
+const testimonialLeftArrow = document.querySelector(".testimonial-left-arrow-img");
+const testimonialRightArrow = document.querySelector(".testimonial-right-arrow-img");
 const testimonialContainer = document.querySelector(".testimonials-container");
-const allTestimonialCards = document.querySelectorAll(
+
+// Wrapper divs (for desktop - 4 cards)
+const wrapperDivs = document.querySelectorAll(
     ".flex_one_card, .flex_second_and_third_card, .flex_fourth_card"
 );
 
+// Individual cards (for mobile - 1 card at a time)
+const allTestimonialCards = document.querySelectorAll(".testimonial-card");
+
 let currentTestimonialIndex = 0;
-const totalTestimonialSets = allTestimonialCards.length;
+
+// Check if mobile/tablet (up to 766px)
+function isMobileOrTablet() {
+    return window.innerWidth <= 766;
+}
 
 // Initial setup
 function initializeTestimonials() {
-    // Pehla set visible karo
-    showTestimonialSet(0);
+    showTestimonials();
 }
 
-// Show specific testimonial set
-// function showTestimonialSet(index) {
-//     allTestimonialCards.forEach((card, i) => {
-//         if (i === index || (index === 0 && i < 3)) {
-//             card.style.display = "block";
-//             card.style.animation = "fadeInUp 0.5s ease forwards";
-//         } else {
-//             card.style.display = "none";
-//         }
-//     });
-// }
-
-function showTestimonialSet(index) {
-    allTestimonialCards.forEach((card, i) => {
-        card.style.display = "none"; // sab hide karo
-    });
-
-    // Current card set ko show karo (infinite rotation)
-    const visibleCount = 3; // ek bar me 3 cards dikhane hain (adjust kar sakta hai)
-    for (let i = 0; i < visibleCount; i++) {
-        const cardIndex = (index + i) % allTestimonialCards.length; // loop back for infinite
-        // allTestimonialCards[cardIndex].style.display = "block";
-        allTestimonialCards[cardIndex].style.display = "flex";
-
-        allTestimonialCards[cardIndex].style.animation = "fadeInUp 0.5s ease forwards";
+// Main function - handles both desktop and mobile
+function showTestimonials() {
+    if (isMobileOrTablet()) {
+        // MOBILE MODE - Show 1 individual card at a time
+        showMobileView();
+    } else {
+        // DESKTOP MODE - Show all 4 cards (wrapper divs)
+        showDesktopView();
     }
 }
 
+// Desktop view - Show all wrapper divs (4 cards visible)
+function showDesktopView() {
+    // Show all wrapper divs
+    wrapperDivs.forEach(div => {
+        div.style.display = "flex"; // or "block" depending on your layout
+    });
+    
+    // Show all individual cards
+    allTestimonialCards.forEach(card => {
+        card.style.display = "block";
+    });
+    
+    // console.log("Desktop mode: Showing all 4 cards");
+}
 
-// Left arrow click - Previous testimonials
+// Mobile view - Show only 1 card at current index
+function showMobileView() {
+    // Hide all individual cards first
+    allTestimonialCards.forEach(card => {
+        card.style.display = "none";
+    });
+    
+    // Show only current card
+    const cardIndex = currentTestimonialIndex % allTestimonialCards.length;
+    allTestimonialCards[cardIndex].style.display = "block";
+    // allTestimonialCards[cardIndex].style.animation = "fadeInUp 0.5s ease forwards";
+    
+    // console.log(`Mobile mode: Showing card ${cardIndex + 1}/${allTestimonialCards.length}`);
+}
+
+// Left arrow click - Previous testimonial (mobile only)
 if (testimonialLeftArrow) {
     testimonialLeftArrow.addEventListener("click", () => {
+        if (!isMobileOrTablet()) {
+            console.log("Desktop mode - arrows disabled");
+            return; // Desktop pe arrows kaam nahi karenge
+        }
+        
         console.log("Left arrow clicked");
 
-        // Add click animation
+        // Click animation
         testimonialLeftArrow.style.transform = "scale(0.9)";
         setTimeout(() => {
             testimonialLeftArrow.style.transform = "scale(1)";
         }, 150);
 
-        // Testimonials ko left side scroll effect
+        // Slide animation
         testimonialContainer.style.animation = "slideOutRight 0.4s ease";
 
         setTimeout(() => {
-            currentTestimonialIndex =
-                (currentTestimonialIndex - 1 + totalTestimonialSets) %
-                totalTestimonialSets;
-            showTestimonialSet(currentTestimonialIndex);
+            // Previous card
+            currentTestimonialIndex = (currentTestimonialIndex - 1 + allTestimonialCards.length) % allTestimonialCards.length;
+            showTestimonials();
             testimonialContainer.style.animation = "slideInLeft 0.4s ease";
         }, 400);
-
-        // Feedback message
-        console.log("Showing previous testimonials");
     });
 }
 
-// Right arrow click - Next testimonials
+// Right arrow click - Next testimonial (mobile only)
 if (testimonialRightArrow) {
     testimonialRightArrow.addEventListener("click", () => {
-        console.log("Right arrow clicked");
+        if (!isMobileOrTablet()) {
+            console.log("Desktop mode - arrows disabled");
+            return; // Desktop pe arrows kaam nahi karenge
+        }
+        
+        // console.log("Right arrow clicked");
 
-        // Add click animation
+        // Click animation
         testimonialRightArrow.style.transform = "scale(0.9)";
         setTimeout(() => {
             testimonialRightArrow.style.transform = "scale(1)";
         }, 150);
 
-        // Testimonials k right side scroll effect
+        // Slide animation
         testimonialContainer.style.animation = "slideOutLeft 0.4s ease";
 
         setTimeout(() => {
-            currentTestimonialIndex =
-                (currentTestimonialIndex + 1) % totalTestimonialSets;
-            showTestimonialSet(currentTestimonialIndex);
+            // Next card
+            currentTestimonialIndex = (currentTestimonialIndex + 1) % allTestimonialCards.length;
+            showTestimonials();
             testimonialContainer.style.animation = "slideInRight 0.4s ease";
         }, 400);
-
-        // Feedback message
-        console.log("Showing next testimonials");
     });
 }
 
 // Individual testimonial card click - Show full review
-const testimonialCards = document.querySelectorAll(".testimonial-card");
-
-testimonialCards.forEach((card, index) => {
+allTestimonialCards.forEach((card) => {
     card.addEventListener("click", () => {
         const customerName = card.querySelector(".customer-name").textContent;
         const quote = card.querySelector(".quote").textContent;
@@ -636,44 +572,480 @@ ${quote}
 Click OK to close.
         `);
     });
-
-    // Hover effect enhancement
-    // card.addEventListener("mouseenter", () => {
-    //     card.style.transform = "translateY(-5px)";
-    //     card.style.boxShadow = "0 8px 20px rgba(0, 0, 0, 0.12)";
-    // });
-
-    // card.addEventListener("mouseleave", () => {
-    //     card.style.transform = "translateY(0)";
-    //     card.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.06)";
-    // });
 });
 
-// Auto-play carousel (optional - comment out if not needed)
-let autoPlayInterval;
-
-// function startAutoPlay() {
-//     autoPlayInterval = setInterval(() => {
-//         if (testimonialRightArrow) {
-//             testimonialRightArrow.click();
-//         }
-//     }, 50000); // Har 5 seconds mein automatically next
-// }
-
-function stopAutoPlay() {
-    clearInterval(autoPlayInterval);
-}
-
-// Auto-play start karo (optional)
-// startAutoPlay();
-
-// Jab user arrows pe hover kare toh auto-play band karo
-if (testimonialLeftArrow && testimonialRightArrow) {
-    testimonialLeftArrow.addEventListener("mouseenter", stopAutoPlay);
-    testimonialRightArrow.addEventListener("mouseenter", stopAutoPlay);
-    testimonialLeftArrow.addEventListener("mouseleave", startAutoPlay);
-    testimonialRightArrow.addEventListener("mouseleave", startAutoPlay);
-}
+// Window resize handler - switch between mobile/desktop
+let resizeTimer;
+window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        currentTestimonialIndex = 0; // Reset to first
+        showTestimonials();
+    }, 250);
+});
 
 // Initialize on page load
 initializeTestimonials();
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const hamburger = document.querySelector('.ri-menu-3-line');
+    const navMenu = document.querySelector('.nav-menu');
+    const body = document.body;
+    const html = document.documentElement;
+
+    // IMPORTANT: Ensure menu is closed on page load
+    navMenu.classList.remove('active');
+    body.classList.remove('menu-open');
+    html.classList.remove('menu-open');
+
+    if (hamburger && navMenu) {
+        // Hamburger click handler
+        hamburger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            // Toggle menu
+            navMenu.classList.toggle('active');
+            body.classList.toggle('menu-open');
+            html.classList.toggle('menu-open');  // Lock HTML too
+            
+            // Change icon
+            if (navMenu.classList.contains('active')) {
+                hamburger.classList.remove('ri-menu-3-line');
+                hamburger.classList.add('ri-close-line');
+            } else {
+                hamburger.classList.add('ri-menu-3-line');
+                hamburger.classList.remove('ri-close-line');
+            }
+        });
+
+        // Close on overlay click
+        document.addEventListener('click', function(e) {
+            if (navMenu.classList.contains('active') && 
+                !navMenu.contains(e.target) && 
+                !hamburger.contains(e.target)) {
+                closeMenu();
+            }
+        });
+
+        // Close on link click
+        const menuLinks = document.querySelectorAll('.nav-menu a');
+        menuLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                closeMenu();
+            });
+        });
+
+        // Close menu function
+        function closeMenu() {
+            navMenu.classList.remove('active');
+            body.classList.remove('menu-open');
+            html.classList.remove('menu-open');
+            hamburger.classList.add('ri-menu-3-line');
+            hamburger.classList.remove('ri-close-line');
+        }
+    }
+});
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  
+
+  const words = ['website', 'Service', 'Book', 'Business', 'Apps','Sports'];
+  
+
+  const typingSpeed = 150;    
+  const deletingSpeed = 100;  
+  const pauseAfterWord = 2000;
+  const pauseAfterDelete = 500; 
+
+  const heroHeading = document.querySelector('.hero h1');
+  
+  if (!heroHeading) {
+    console.error('Hero heading not found!');
+    return;
+  }
+
+
+  
+  heroHeading.innerHTML = `
+    XiDomains: the smartest, fastest<br>
+    way to name a <span class="dynamic-word" style="border-right: 2px solid white; padding-right: 4px; display: inline-block;"></span>
+  `;
+  
+  const dynamicWord = heroHeading.querySelector('.dynamic-word');
+  
+  let wordIndex = 0;        // Current word
+  let charIndex = 0;        // Current character
+  let isDeleting = false;   // Delete mode?
+  
+  // Main typing function
+  function typeEffect() {
+    const currentWord = words[wordIndex];
+    
+    if (isDeleting) {
+      // BACKSPACE MODE: Characters delete karo
+      charIndex--;
+      dynamicWord.textContent = currentWord.substring(0, charIndex);
+      
+      // Agar sab delete ho gaya
+      if (charIndex === 0) {
+        isDeleting = false;
+        wordIndex = (wordIndex + 1) % words.length; // Next word
+        setTimeout(typeEffect, pauseAfterDelete);
+        return;
+      }
+      
+      setTimeout(typeEffect, deletingSpeed);
+      
+    } else {
+      // TYPING MODE: Characters add karo
+      charIndex++;
+      dynamicWord.textContent = currentWord.substring(0, charIndex);
+      
+      // Agar pura word type ho gaya
+      if (charIndex === currentWord.length) {
+        isDeleting = true;
+        setTimeout(typeEffect, pauseAfterWord);
+        return;
+      }
+      
+      setTimeout(typeEffect, typingSpeed);
+    }
+  }
+  
+  // Animation start (500ms delay)
+  setTimeout(typeEffect, 500);
+  
+  // Cursor blink effect
+  setInterval(() => {
+    if (dynamicWord) {
+      dynamicWord.style.borderRightColor = 
+        dynamicWord.style.borderRightColor === 'transparent' ? 'white' : 'transparent';
+    }
+  }, 530);
+  
+});
+
+
+
+// copiwali domain card ke liye
+
+
+
+
+// Check if iPad Mini screen size
+// function isIPadMini() {
+//   const width = window.innerWidth;
+//   return width >= 425 && width <= 768;
+// }
+
+// // iPad Mini specific scroll handler
+// if (isIPadMini()) {
+//   const leftArrow = document.querySelector(".left-arrow");
+//   const rightArrow = document.querySelector(".right-arrow");
+//   const domainGrid = document.querySelector(".domain-grid");
+
+//   if (leftArrow && rightArrow && domainGrid) {
+    
+//     // iPad Mini scroll amount = Card width (156px) + Gap (20px) = 176px
+//     const IPAD_SCROLL_AMOUNT = 176;
+
+//     // Get max scrollable distance
+//     function getMaxScroll() {
+//       return domainGrid.scrollWidth - domainGrid.clientWidth;
+//     }
+
+//     // Update arrow states (enable/disable)
+//     function updateArrows() {
+//       const currentScroll = domainGrid.scrollLeft;
+//       const maxScroll = getMaxScroll();
+
+//       // Left arrow
+//       if (currentScroll <= 5) {
+//         leftArrow.style.opacity = '0.4';
+//         leftArrow.style.cursor = 'not-allowed';
+//         leftArrow.disabled = true;
+//       } else {
+//         leftArrow.style.opacity = '1';
+//         leftArrow.style.cursor = 'pointer';
+//         leftArrow.disabled = false;
+//       }
+
+//       // Right arrow
+//       if (currentScroll >= maxScroll - 5) {
+//         rightArrow.style.opacity = '0.4';
+//         rightArrow.style.cursor = 'not-allowed';
+//         rightArrow.disabled = true;
+//       } else {
+//         rightArrow.style.opacity = '1';
+//         rightArrow.style.cursor = 'pointer';
+//         rightArrow.disabled = false;
+//       }
+//     }
+
+//     // Scroll exactly ONE card
+//     function scrollOneCard(direction) {
+//       const currentScroll = domainGrid.scrollLeft;
+//       const maxScroll = getMaxScroll();
+      
+//       let newScrollPosition;
+      
+//       if (direction === 'left') {
+//         // Left scroll - ek card peeche
+//         newScrollPosition = Math.max(0, currentScroll - IPAD_SCROLL_AMOUNT);
+//       } else {
+//         // Right scroll - ek card aage
+//         newScrollPosition = Math.min(maxScroll, currentScroll + IPAD_SCROLL_AMOUNT);
+//       }
+
+//       // Smooth scroll karo
+//       domainGrid.scrollTo({
+//         left: newScrollPosition,
+//         behavior: 'smooth'
+//       });
+
+//       // Arrows update karo (animation ke baad)
+//       setTimeout(updateArrows, 350);
+//     }
+
+//     // Left arrow click
+//     leftArrow.addEventListener('click', (e) => {
+//       e.preventDefault();
+//       e.stopPropagation();
+//       if (!leftArrow.disabled) {
+//         scrollOneCard('left');
+//       }
+//     });
+
+//     // Right arrow click
+//     rightArrow.addEventListener('click', (e) => {
+//       e.preventDefault();
+//       e.stopPropagation();
+//       if (!rightArrow.disabled) {
+//         scrollOneCard('right');
+//       }
+//     });
+
+//     // Manual scroll pe arrows update
+//     domainGrid.addEventListener('scroll', () => {
+//       clearTimeout(domainGrid.scrollTimeout);
+//       domainGrid.scrollTimeout = setTimeout(updateArrows, 50);
+//     });
+
+//     // Window resize pe reset
+//     let resizeTimeout;
+//     window.addEventListener('resize', () => {
+//       clearTimeout(resizeTimeout);
+//       resizeTimeout = setTimeout(() => {
+//         if (isIPadMini()) {
+//           domainGrid.scrollLeft = 0;
+//           updateArrows();
+//         }
+//       }, 300);
+//     });
+
+//     // Initial state
+//     updateArrows();
+    
+//     // Page load ke baad bhi check karo
+//     window.addEventListener('load', () => {
+//       setTimeout(updateArrows, 100);
+//     });
+
+//     console.log('✅ iPad Mini domain slider initialized - 176px per scroll');
+//   }
+// }
+
+
+// 2nd js
+
+
+// ========================================
+// IPAD MINI DOMAIN SLIDER - EXACT 1 CARD SCROLL
+// ========================================
+
+// Check if screen is iPad Mini size
+function isIPadMini() {
+  const width = window.innerWidth;
+  return width >= 425 && width <= 768;
+}
+
+// iPad Mini specific scroll handler
+if (isIPadMini()) {
+  const leftArrow = document.querySelector(".left-arrow");
+  const rightArrow = document.querySelector(".right-arrow");
+  const domainGrid = document.querySelector(".domain-grid");
+
+  if (leftArrow && rightArrow && domainGrid) {
+    
+    // ✅ YAHA SE 4 CARDS HUE - Scroll amount update ki
+    // Card width (145px) + Gap (16px) = 161px
+    // Arrow click pe exactly 161px scroll hoga = 1 card
+    const IPAD_SCROLL_AMOUNT = 207; // Pehle 176px tha (156+20), ab 161px (145+16)
+
+    // Get maximum scrollable distance
+    function getMaxScroll() {
+      return domainGrid.scrollWidth - domainGrid.clientWidth;
+    }
+
+    // Update arrow states (enable/disable based on position)
+    function updateArrows() {
+      const currentScroll = domainGrid.scrollLeft;
+      const maxScroll = getMaxScroll();
+
+      // Left arrow - disable at start
+      if (currentScroll <= 5) {
+        leftArrow.style.opacity = '0.4';
+        leftArrow.style.cursor = 'not-allowed';
+        leftArrow.disabled = true;
+      } else {
+        leftArrow.style.opacity = '1';
+        leftArrow.style.cursor = 'pointer';
+        leftArrow.disabled = false;
+      }
+
+      // Right arrow - disable at end
+      if (currentScroll >= maxScroll - 5) {
+        rightArrow.style.opacity = '0.4';
+        rightArrow.style.cursor = 'not-allowed';
+        rightArrow.disabled = true;
+      } else {
+        rightArrow.style.opacity = '1';
+        rightArrow.style.cursor = 'pointer';
+        rightArrow.disabled = false;
+      }
+    }
+
+    // ✅ YAHA ARROW CLICK PE SCROLL HOTA HAI
+    // Scroll exactly ONE card (161px)
+    function scrollOneCard(direction) {
+      const currentScroll = domainGrid.scrollLeft;
+      const maxScroll = getMaxScroll();
+      
+      let newScrollPosition;
+      
+      if (direction === 'left') {
+        // ✅ LEFT ARROW: 161px peeche scroll (1 card left)
+        newScrollPosition = Math.max(0, currentScroll - IPAD_SCROLL_AMOUNT);
+        // console.log(`⬅️ Scrolling LEFT: ${IPAD_SCROLL_AMOUNT}px (1 card)`);
+      } else {
+        // ✅ RIGHT ARROW: 161px aage scroll (1 card right)
+        newScrollPosition = Math.min(maxScroll, currentScroll + IPAD_SCROLL_AMOUNT);
+        // console.log(`➡️ Scrolling RIGHT: ${IPAD_SCROLL_AMOUNT}px (1 card)`);
+      }
+
+      // ✅ YAHA ACTUAL SCROLL HOTA HAI - Smooth animation ke saath
+      domainGrid.scrollTo({
+        left: newScrollPosition, // 161px scroll position
+        behavior: 'smooth' // Smooth animation
+      });
+
+      // Update arrows after scroll animation completes (350ms delay)
+      setTimeout(updateArrows, 350);
+    }
+
+    // Left arrow click event
+    leftArrow.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!leftArrow.disabled) {
+        scrollOneCard('left'); // ✅ Left scroll trigger
+      }
+    });
+
+    // Right arrow click event
+    rightArrow.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!rightArrow.disabled) {
+        scrollOneCard('right'); // ✅ Right scroll trigger
+      }
+    });
+
+    // Update arrows when user manually scrolls (drag/swipe)
+    domainGrid.addEventListener('scroll', () => {
+      clearTimeout(domainGrid.scrollTimeout);
+      domainGrid.scrollTimeout = setTimeout(updateArrows, 50);
+    });
+
+    // Reset scroll position on window resize
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        if (isIPadMini()) {
+          domainGrid.scrollLeft = 0; // Reset to start
+          updateArrows();
+        }
+      }, 300);
+    });
+
+    // Initial arrow state on page load
+    updateArrows();
+    
+    // Double-check after complete page load
+    window.addEventListener('load', () => {
+      setTimeout(updateArrows, 100);
+    });
+
+    // console.log('✅ iPad Mini domain slider initialized');
+    // console.log(`📏 Scroll amount per click: ${IPAD_SCROLL_AMOUNT}px (145px card + 16px gap)`);
+  }
+}
+
+
+/* ========================================
+   📊 SCROLL CALCULATION EXPLAINED:
+   
+   ✅ 4 CARDS TERE CASE MEIN YAHA SE AAYE:
+   
+   1. CSS Changes:
+      - Card width: 156px → 145px (11px choti ki)
+      - Gap: 20px → 16px (4px kam ki)
+      - Padding: 70px → 60px (10px kam ki)
+   
+   2. JS Changes:
+      - Scroll amount: 176px → 161px
+      - Formula: Card width + Gap = 145 + 16 = 161px
+   
+   3. Result:
+      - Exactly 4 cards fit on screen
+      - Arrow click = 161px scroll = 1 card movement
+      - No half-cut cards visible
+   
+   ======================================== */
+
+
+   // Logo clone inside hamburger menu
+document.addEventListener('DOMContentLoaded', function() {
+    const navMenu = document.querySelector('.nav-menu');
+    const logo = document.querySelector('.nav-brand .logo');
+    
+    // Check if mobile view (below 425px)
+    function addLogoToMenu() {
+        if (window.innerWidth <= 424 && navMenu && logo) {
+            // Check if logo already added (to avoid duplicates)
+            if (!navMenu.querySelector('.menu-logo-clone')) {
+                // Clone the logo
+                const logoClone = logo.cloneNode(true);
+                logoClone.classList.add('menu-logo-clone'); // Unique class
+                
+                // Insert at the top of nav-menu (before first li)
+                navMenu.insertBefore(logoClone, navMenu.firstChild);
+            }
+        }
+    }
+    
+    // Run on load
+    addLogoToMenu();
+    
+    // Run on resize (if user rotates device)
+    window.addEventListener('resize', addLogoToMenu);
+});
+

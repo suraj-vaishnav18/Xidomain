@@ -151,24 +151,50 @@ body {
 
 }
 
-.nav-menu-under{
-  /* margin-left: 11px; */
+/* .nav-menu-under{
+  
     display: flex;
   list-style: none;
   gap:9px;
-  /* font-size: 14px;
-  font-weight: 800;
-  line-height: 100%;
-  letter-spacing: 0%; */
+  
+  letter-spacing: 0%; 
   font-family: "Roboto", sans-serif;
 
-  /* font-weight: 500; */
+ 
   font-style: Medium;
   font-size: 16px;
-  /* leading-trim: NONE; */
+ 
   line-height: 100%;
   letter-spacing: 0%;
   text-transform: capitalize;
+} */
+
+/* copiwali */
+
+/* Add ye nav-menu-under ke andar */
+.nav-menu-under {
+    display: flex;  /* Pehle wala same */
+    list-style: none;
+    gap: 9px;
+    font-family: "Roboto", sans-serif;
+    font-style: Medium;
+    font-size: 16px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    text-transform: capitalize;
+    /* Naya: Mobile ke liye ready */
+    flex-direction: row;  /* Desktop horizontal */
+}
+
+/* Sidebar header */
+.sidebar-header {
+    font-size: 18px;
+    font-weight: bold;
+    color: #007bff;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 15px;
+    list-style: none;  /* No bullet */
 }
 
 #sell_a_domain {
@@ -225,12 +251,12 @@ body {
 }
 
 .search-header-icon{
-  height: 19px;
-  width: 19px;
+     height: 18px;
+    width: 20px;
 }
 
 .like-header-icon{
-  height: 18px;
+  height: 19px;
   width: 19px;
 }
 
@@ -274,6 +300,9 @@ body {
 .ri-menu-3-line{
   cursor: pointer;
 }
+
+
+/* hmbrger */
 
 
 
@@ -323,8 +352,10 @@ body {
   line-height: 120%;
   margin-left: 11px;
   display: flex;
-  align-items: center;
+  /* align-items: center; */
   /* justify-content: center; */
+  display: block;  /* Block ya inline-block better hai */
+  text-align: center;
   letter-spacing: 0%;
 }
 
@@ -389,13 +420,25 @@ position: relative;
   font-size: 13px;
   border-radius: 50px;
   outline: none;
+  border: none;
  color: #222 !important;
 
   opacity: 60%;
+
+    -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.domain-search:focus {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 ::placeholder { /* Most modern browsers support this now. */
    color:    #565454;
+  
 }
 .search-btn {
   position: absolute;
@@ -455,14 +498,20 @@ position: relative;
   letter-spacing: 2%;
   font-weight: 300;
   letter-spacing: 0%;
+  
   /* gap:6px */
+  
 }
 
 .domain-suggestions span:hover {
   background: rgba(255, 255, 255, 0.3);
 }
 
+
+
 /* Premium Domains */
+
+
 .premium-domains {
   padding: 4.5rem 0;
   background: #f8fafc;
@@ -496,7 +545,7 @@ position: relative;
   margin-bottom: 3rem;
 }
 
-.slider-arrow {
+/* .slider-arrow {
   width: 40px;
   height: 40px;
   cursor: pointer;
@@ -514,14 +563,66 @@ position: relative;
   right: -50px;
   z-index:8;
 
+} */
+
+
+.slider-arrow {
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  margin: 0 10px;
+  z-index: 300;  /* Higher z-index */
+  /* overflow: visible; */
+  /* padding: 0 50px; */
+
+  
 }
 
-.domain-grid {
+.left-arrow {
+  position: absolute;
+  /* position: relative; */
+  left: -25px;
+}
+
+
+
+.right-arrow {
+  position: absolute;
+  right: -45px;
+}
+
+
+
+
+/* .domain-grid {
     height: 130px;
   display: flex;
   gap: 1.5rem;
   overflow-x: hidden;
   padding: 0 20px;
+} */
+
+
+
+
+.domain-grid {
+  height: 130px;
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;  /* Desktop pe auto scroll allow */
+  padding: 0 20px;
+ 
+  flex-wrap: nowrap;  /* No wrap, horizontal only */
+  will-change: transform;  /* Updated: Better performance for slides */
+}
+
+.domain-grid::-webkit-scrollbar {
+  display: none;
+}
+
+.domain-grid {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .domain-card {
@@ -533,6 +634,8 @@ position: relative;
   /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); */
   transition: transform 0.3s, box-shadow 0.3s;
   cursor: pointer;
+  flex-shrink: 0;  /* Updated: Cards shrink na karein */
+  scroll-snap-align: start;  /* Snap to start of card */
 }
 
 .domain-card:hover {
@@ -766,7 +869,7 @@ position: relative;
   
 } */
 
-/* grok */
+/* grok customer section */
 .customers-section {
   height: 177px;
   width: 100%;
@@ -1337,6 +1440,8 @@ position: relative;
 
 
 /* FAQ */
+
+/* copi wali */
 /* FAQ */
 
 .section-title {
@@ -1366,16 +1471,23 @@ position: relative;
 }
 
 .faq-item.active {
-  height: 120px;
-  background: #FFFFFF; /* Poora active item white bg */
+  height: auto; /* auto rakho, fixed height nahi */
+  background: #FFFFFF;
   margin-bottom: 10px;
   border-radius: 15px;
   overflow: hidden;
   box-shadow: 4px 4px 25px 0px #0000001A;
+  border-bottom: none; /* Active item pe border hatao */
+   border: none;
+
+  border: none !important; /* Force remove all borders */
+  border-bottom: none !important;
+  border-top: none !important;
 }
 
+
 .faq-item:not(.active) {
-  height: 90px;
+  height: auto;
   background: transparent;
   box-shadow: none;
   border-radius: 0;
@@ -1384,8 +1496,6 @@ position: relative;
 }
 
 .faq-question {
-  padding-bottom: 11px !important;
-  /* margin-top: 25px; */
   padding: 20px;
   cursor: pointer;
   font-weight: 700;
@@ -1394,20 +1504,22 @@ position: relative;
   align-items: center;
   color: #040715;
   font-size: 18px;
-  background: transparent; /* Default transparent */
+  background: transparent;
+  outline: none; /* Agar click pe outline aa raha ho */
+  border: none; 
 }
 
-.faq-plus-img{
-  height: 20px;
-  width: 20px;
-}
-
-.faq-question.second{
-  margin-top: 25px;
+.faq-question.second {
+  margin-top: 0; /* Yeh unnecessary hai, remove karo */
 }
 
 .faq-item.active .faq-question {
-  background: #FFFFFF; /* Active question white bg */
+  background: #FFFFFF;
+  padding-bottom: 20px; 
+   border: none;
+   outline: none;
+    border-top: none !important;
+  border-bottom: none !important;
 }
 
 .faq-answer {
@@ -1415,45 +1527,45 @@ position: relative;
   color: #4D4D4D;
   font-size: 14px;
   line-height: 1.6;
-  display: none;
-  background: #FFFFFF; /* Answer white, but since parent white, seamless */
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
 }
 
 .faq-item.active .faq-answer {
-  display: block;
-  animation: slideDown 0.3s ease;
+  max-height: 500px;
+  opacity: 1;
 }
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
+/* Plus Icon Styling */
 .plus_img {
+  height: 24px;
+  width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0; /* Icon ko squish hone se bachao */
+}
+
+.faq-plus-img {
   height: 20px;
   width: 20px;
+  /* transition: transform 0.3s ease; */
+  transition: transform 0.3s ease, filter 0.3s ease;
 }
 
-.plus_img img {
-  transition: transform 0.3s ease;
-}
-
-.faq-item.active .plus_img img {
+/* Active state - sirf CSS se handle karo */
+.faq-item.active .faq-plus-img {
   transform: rotate(45deg);
+  filter: invert(1) grayscale(100%) brightness(0);
 }
 
-/* Loading state for buttons */
+/* Button states */
 button:disabled {
   cursor: not-allowed !important;
 }
 
-/* Fade-in animation */
 .fade-in {
   animation: fadeIn 0.8s ease-in;
 }
@@ -1469,24 +1581,6 @@ button:disabled {
   }
 }
 
-/* FAQ - Existing styles same, sirf ye add/update kar... */
-
-.plus_img {
-  height: 20px;
-  width: 20px;
-}
-
-.plus_img img {
-  transition: transform 0.3s ease, filter 0.3s ease; /* Smooth rotation + color change */
-  filter: hue-rotate(0deg) saturate(1); /* Default: blue (adjust hue if needed) */
-}
-
-.faq-item.active .plus_img img {
-  transform: rotate(45deg);
-  filter: grayscale(100%) brightness(0); /* Active: black (grayscale + darkens to black) */
-  /* Ya agar exact black chahiye aur original light hai, to: filter: grayscale(100%) sepia(0) brightness(0); */
-}
-/* Smooth transitions */
 .domain-card,
 .collection_images img,
 .view-all-btn,
@@ -1494,13 +1588,40 @@ button:disabled {
   transition: all 0.3s ease;
 }
 
-/* Button hover states enhancement */
 .view-all-btn:active,
 .view_all_categories:active {
   transform: scale(0.98);
 }
 
+.faq-item.active {
+  height: auto;
+  background: #FFFFFF;
+  margin-bottom: 10px;
+  margin-top: 10px; /* Yeh upar space dega taaki border separate dikhe */
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 4px 4px 25px 0px #0000001A;
+  border: none;
+  padding-top: 0; /* Ensure no extra padding */
+}
 
+
+
+.faq-question {
+  padding: 20px;
+  cursor: pointer;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #040715;
+  font-size: 18px;
+  background: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none; /* Yeh add karo */
+  border-top: none; /* Yeh add karo */
+}
 
 /* Hero Section */
 .hero-wrapper{
